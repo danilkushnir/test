@@ -8,7 +8,7 @@ const app = express();
 module.exports = cds.service.impl(async function (srv) {
  
  
-   cds.once('served', async () => {    
+  srv.on("Aktien", async (req, res) => {
     
      let browser;
 
