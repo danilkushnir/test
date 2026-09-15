@@ -37,10 +37,10 @@ COPY . .
 
 
 
-RUN node runAll.js
+# RUN node runAll.js
 
-# RUN cds build
-# RUN cds deploy --to sqlite
+RUN cds build
+RUN cds deploy --to sqlite
 
 WORKDIR /app/app/books
 RUN npm install
