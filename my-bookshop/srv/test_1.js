@@ -8,10 +8,13 @@ async function runScraper() {
 
   try {
 
-    browser = await puppeteer.launch({
-      headless: false,
-      defaultViewport: null,
-    });
+      browser = await puppeteer.launch({
+  headless: true,                     // Railway braucht headless
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox'
+  ]
+   });
 
     const page = await browser.newPage();
 
