@@ -1,34 +1,49 @@
 FROM node:20
 
-# Arbeitsverzeichnis
+# Chromium Dependencies installieren
+RUN apt-get update && apt-get install -y \
+    libnss3 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libx11-6 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libgbm1 \
+    libasound2 \
+    libpangocairo-1.0-0 \
+    libpango-1.0-0 \
+    libgtk-3-0 \
+    libxshmfence1 \
+    libxext6 \
+    libxfixes3 \
+    libxkbcommon0 \
+    libxrender1 \
+    libdrm2 \
+    libxcb1 \
+    libxinerama1 \
+    libxcursor1 \
+    libxi6 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Package-Dateien kopieren
 COPY package*.json ./
 
-# CAP CLI installieren
 RUN npm install -g @sap/cds-dk
-
-# Projekt-Abhängigkeiten installieren
 RUN npm install
 
-# Restliches Projekt kopieren
 COPY . .
 
-# CAP Backend bauen
 RUN cds build
 RUN cds deploy --to sqlite
 
-# UI5 App bauen (UI5-CLI benötigt Node >= 20.11)
 WORKDIR /app/app/books
 RUN npm install
 RUN npm run build
 
-# Zurück zum Hauptordner
 WORKDIR /app
 
-# Port für Railway
 EXPOSE 8080
 
-# CAP Backend starten (liefert auch statische UI aus)
 CMD ["cds", "run", "--port", "8080"]
