@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:20
 
 # Arbeitsverzeichnis
 WORKDIR /app
@@ -15,19 +15,17 @@ RUN npm install
 # Restliches Projekt kopieren
 COPY . .
 
-# CAP Backend bauen (DB deployen)
+# CAP Backend bauen
 RUN cds build
 RUN cds deploy --to sqlite
 
-# UI bauen
+# UI5 App bauen
 WORKDIR /app/app/books
 RUN npm install
 RUN npm run build
 
-# Zurück zum Hauptordner
+# UI Build in CAP einbinden
 WORKDIR /app
-
-# Statische UI-Dateien in CAP einbinden
 RUN mkdir -p app/books/dist
 RUN cp -r app/books/build/* app/books/dist/
 
