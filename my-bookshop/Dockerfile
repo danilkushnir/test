@@ -19,15 +19,13 @@ COPY . .
 RUN cds build
 RUN cds deploy --to sqlite
 
-# UI5 App bauen
+# UI5 App bauen (UI5-CLI benötigt Node >= 20.11)
 WORKDIR /app/app/books
 RUN npm install
 RUN npm run build
 
-# UI Build in CAP einbinden
+# Zurück zum Hauptordner
 WORKDIR /app
-RUN mkdir -p app/books/dist
-RUN cp -r app/books/build/* app/books/dist/
 
 # Port für Railway
 EXPOSE 8080
