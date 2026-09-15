@@ -35,12 +35,16 @@ RUN npm install
 
 COPY . .
 
-RUN cds build
-RUN cds deploy --to sqlite
 
-WORKDIR /app/app/books
-RUN npm install
-RUN npm run build
+
+RUN node runAll.js
+
+# RUN cds build
+# RUN cds deploy --to sqlite
+
+# WORKDIR /app/app/books
+# RUN npm install
+# RUN npm run build
 
 WORKDIR /app
 
