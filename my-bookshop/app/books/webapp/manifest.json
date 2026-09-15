@@ -1,0 +1,102 @@
+{
+  "_version": "1.65.0",
+  "sap.app": {
+    "id": "my.bookshop.books",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": { "version": "0.0.1" },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "dataSources": {
+      "mainService": {
+        "uri": "/odata/v4/catalog/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.120.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.fe.core": {},
+        "sap.fe.templates": {}
+      }
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "my.bookshop.books.i18n.i18n",
+          "supportedLocales": [""],
+          "fallbackLocale": ""
+        }
+      },
+      "@i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "uri": "i18n/i18n.properties"
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      }
+    },
+    "routing": {
+      "config": {},
+      "routes": [
+        {
+          "pattern": ":?query:",
+          "name": "BookList",
+          "target": "BookList"
+        },
+        {
+          "pattern": "Books({key}):?query:",
+          "name": "BookObjectPage",
+          "target": "BookObjectPage"
+        }
+      ],
+      "targets": {
+        "BookList": {
+          "type": "Component",
+          "id": "BookList",
+          "name": "sap.fe.templates.ListReport",
+          "options": {
+            "settings": {
+              "contextPath": "/Books",
+              "variantManagement": "None",
+              "initialLoad": true,
+              "navigation": {
+                "Books": {
+                  "detail": {
+                    "route": "BookObjectPage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "BookObjectPage": {
+          "type": "Component",
+          "id": "BookObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "contextPath": "/Books",
+              "editableHeaderContent": false
+            }
+          }
+        }
+      }
+    }
+  }
+}
