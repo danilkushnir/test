@@ -42,9 +42,9 @@ RUN node runAll.js
 # RUN cds build
 # RUN cds deploy --to sqlite
 
-# WORKDIR /app/app/books
-# RUN npm install
-# RUN npm run build
+WORKDIR /app/app/books
+RUN npm install
+RUN npm run build
 
 WORKDIR /app
 
