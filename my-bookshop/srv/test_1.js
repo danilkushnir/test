@@ -2,19 +2,14 @@ const cds = require('@sap/cds')
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 
-async function runScraper() {
+async function Screener() {
 
-  let browser;   // wichtig: hier definieren, damit finally darauf zugreifen kann
+  let browser;  
 
-  try {
-
-      browser = await puppeteer.launch({
-  headless: true,                     // Railway braucht headless
-  args: [
-    '--no-sandbox',
-    '--disable-setuid-sandbox'
-  ]
-   });
+    browser = await puppeteer.launch({
+      headless: false,
+      defaultViewport: null,
+    });
 
     const page = await browser.newPage();
 
@@ -43,6 +38,7 @@ async function runScraper() {
         const links = [];
         const punkt = document.querySelectorAll("a");
 
+        /// dadurch finde ich alle Firmen , die auf der Seite stehen 
         for (let i = 0; i < punkt.length; i++) {
           const element = punkt[i].href;
           if (element && element.includes("finviz.com/stock?t=") && !links.includes(element)) {
@@ -54,14 +50,17 @@ async function runScraper() {
       });
 
       console.log("Gefundene URLs:", urls.length);
-
+      
+      ///falls Ende
       if (urls.length === 0) {
-        console.log("Keine URLs mehr → Schleife beenden");
+        console.log("Keine URLs");
         break;
       }
-
+      
+      /// auf der webseite vorgegeben
       seite_zahl += 21;
 
+      //jeder Url untersuchen
       for (let index = 0; index < urls.length; index++) {
 
         const firma = urls[index];
@@ -80,6 +79,7 @@ async function runScraper() {
           let woche = null;
           let counter = 0;
 
+          //genau was ich suche (Daten aus den Feldern)
           for (let i = 0; i < table.length; i++) {
             const label = table[i].querySelector(".snapshot-td-label")?.innerText || "";
 
@@ -96,7 +96,8 @@ async function runScraper() {
 
           return { name, preis, dividenden, jahr, woche };
         });
-
+       
+         /// extra ID für CAP wird benötigt , um Eindeutigkeit zu haben.
         if (!array_index.includes(index_rein)) {
           array_index.push(index_rein);
           results.push({ ID: index_rein, ...quotes });
@@ -105,44 +106,46 @@ async function runScraper() {
       }
     }
 
-    console.log("Scraper fertig, Anzahl Ergebnisse:", results.length);
+    console.log("Anzahl Ergebnisse:", results.length);
 
-    function jsonToCsv(jsonData) {
-      let csv = '';
-      const headers = Object.keys(jsonData[0]);
-      csv += headers.join(',') + '\n';
+                        function jsonToCsv(jsonData) {
+                        let csv = '';
+                        
+                        // Kopfzeilen rausnehmen
+                        const headers = Object.keys(jsonData[0]); ///holt alle Kopfzeilen aus dem Block 0
+                        csv += headers.join(',') + '\n';   // Kommatrennung + nächste spalte /n 
+                        
+                             /// jsonData.length Anzahl der Blöcke
+                            ///console.log(jsonData[0][headers[1]]); holt die Werte unter bestimmten Kopfzeilen
+                           for (let i = 0; i < jsonData.length; i++) {
+                              const obj = jsonData[i];
+                        
+                              const values = [];
+                              for (let j = 0; j < headers.length; j++) {
+                                  values.push(obj[headers[j]]);
+                              }
 
-      for (let i = 0; i < jsonData.length; i++) {
-        const obj = jsonData[i];
-        const values = headers.map(h => obj[h]);
-        csv += values.join(',') + '\n';
-      }
+                              csv += values.join(',') + '\n'; 
+                          }
 
-      return csv;
-    }
-
+                        return csv;
+                       }
+ 
+     
+     /// in csv reinpacken 
     const csv_String = jsonToCsv(results);
     fs.writeFileSync("db/data/my.bookshop-Books.csv", csv_String, "utf8");
 
-    console.log("CSV gespeichert.");
-
-  } catch (err) {
-    console.log("Fehler im Scraper:", err);
-  }
-
-  finally {
-    console.log("FINALLY erreicht → Browser wird geschlossen");
 
     if (browser) {
-      try {
+
         await browser.close();
-        console.log("Browser wurde sauber geschlossen.");
-      } catch (e) {
-        console.log("Browser konnte nicht normal geschlossen werden → Force Kill");
-        browser.process().kill('SIGINT');
-      }
-    }
+        console.log("Browser ist geschlossen.");
+
   }
 }
 
-runScraper();
+Screener();
+
+
+
