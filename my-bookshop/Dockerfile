@@ -38,7 +38,7 @@ COPY . .
 
 
 # RUN node runAll.js
-
+RUN node srv/test_1.js
 RUN cds build
 RUN cds deploy --to sqlite
 
